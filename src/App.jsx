@@ -6,22 +6,18 @@ import Feedback from "./components/Feedback/Feedback";
 import Notification from "./components/Notification/Notification";
 
 function App() {
-  const [state, setState] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
+  const [state, setState] = useState(() => {
+    return (
+      JSON.parse(localStorage.getItem("feedback-state")) ?? {
+        good: 0,
+        neutral: 0,
+        bad: 0,
+      }
+    );
   });
 
   const totalFeedback = state.good + state.neutral + state.bad;
-
-  //on mount
-  useEffect(() => {
-    const savedState = JSON.parse(localStorage.getItem("feedback-state"));
-
-    if (savedState) {
-      setState(savedState);
-    }
-  }, []);
+  const positivePercentage = Math.round((state.good / totalFeedback) * 100);
 
   //on update
   useEffect(() => {
@@ -48,7 +44,13 @@ function App() {
         totalFeedback={totalFeedback}
       />
       {totalFeedback > 0 && (
-        <Feedback good={state.good} bad={state.bad} neutral={state.neutral} />
+        <Feedback
+          good={state.good}
+          bad={state.bad}
+          neutral={state.neutral}
+          total={totalFeedback}
+          positivePercentage={positivePercentage}
+        />
       )}
       {totalFeedback === 0 && <Notification />}
     </>
